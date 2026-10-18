@@ -20,7 +20,7 @@
       try { var v = sessionStorage.getItem(KEY); if (v !== null) saved = parseFloat(v); } catch (e) {}
       if (saved !== null && isNaN(saved)) saved = null;
     }
-    var restoring = saved !== null && saved > 0;
+    var restoring = saved !== null;
 
     // We handle scroll restoration ourselves so the browser doesn't fight us.
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
