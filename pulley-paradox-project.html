@@ -6,31 +6,8 @@
 <title>Pulley Paradox — DTC Project — Alexander Wan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Architects+Daughter&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script>
-  // Keep the page invisible until the web fonts have loaded, then fade it in,
-  // so text never flashes in a fallback font and then changes shape.
-  (function() {
-    var root = document.documentElement;
-    root.classList.add('fonts-loading');
-    var done = false;
-    function show() { if (done) return; done = true; root.classList.remove('fonts-loading'); }
-    setTimeout(show, 2000); // safety net
-    if (document.fonts && document.fonts.load) {
-      Promise.all([
-        document.fonts.load('400 16px "Space Grotesk"'),
-        document.fonts.load('700 16px "Space Grotesk"'),
-        document.fonts.load('400 16px "IBM Plex Sans"'),
-        document.fonts.load('500 16px "IBM Plex Sans"'),
-        document.fonts.load('600 16px "IBM Plex Sans"'),
-        document.fonts.load('400 16px "IBM Plex Mono"'),
-        document.fonts.load('600 16px "IBM Plex Mono"'),
-        document.fonts.load('400 16px "Architects Daughter"')
-      ]).then(function() { return document.fonts.ready; }).then(show, show);
-    } else { show(); }
-  })();
-</script>
 <style>
   /* Additions for this page only (kept here so style.css stays untouched). */
   /* Text on the left, carousel on the right */

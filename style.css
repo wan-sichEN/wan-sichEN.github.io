@@ -696,10 +696,7 @@
   html.intro-pending .hero-photo img { opacity: 0; }
   .portrait-draw { overflow: visible; }
 
-  /* ---------- FONT LOAD GUARD (project pages) ----------
-     Pages add "fonts-loading" to <html> in <head> until web fonts are ready. */
   body { transition: opacity 0.35s ease; }
-  html.fonts-loading body,
   html.hash-pending body { opacity: 0; }
 
   /* ---------- FLOATING EXIT BUTTON (project pages) ----------

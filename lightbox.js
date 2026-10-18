@@ -147,32 +147,60 @@
 
 
 /* ---- Warm-up for the exit button ----
-   Once a project page has finished loading, quietly fetch index.html and the images it uses
-   (read straight from index.html, so this never needs updating). When the reader clicks
-   "Back to projects", the index is already cached and appears almost instantly instead of
-   leaving an empty grid while it downloads. */
+   Preload homepage images on intent and wait for them before navigating back. */
 (function () {
   if (/(^|\/)index\.html?$/.test(location.pathname) || location.pathname.slice(-1) === '/') return;
   var conn = navigator.connection;
-  if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''))) return;
+  var allowIntentPrefetch = !(conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')));
+  var warmPromise = null;
+  var warmComplete = false;
 
   function warm() {
-    fetch('index.html', { credentials: 'same-origin' })
-      .then(function (r) { return r.ok ? r.text() : ''; })
+    if (warmPromise) return warmPromise;
+    warmPromise = fetch('index.html', { credentials: 'same-origin' })
+      .then(function (response) { return response.ok ? response.text() : ''; })
       .then(function (html) {
         if (!html) return;
         var doc = new DOMParser().parseFromString(html, 'text/html');
-        Array.prototype.forEach.call(doc.querySelectorAll('img[src]'), function (img) {
-          var i = new Image();
-          i.src = new URL(img.getAttribute('src'), location.href).href;
+        var indexUrl = new URL('index.html', location.href);
+        var images = Array.prototype.map.call(doc.querySelectorAll('img[src]'), function (source) {
+          return new Promise(function (resolve) {
+            var image = new Image();
+            var settled = false;
+            function finish() {
+              if (settled) return;
+              settled = true;
+              if (image.decode && image.naturalWidth) image.decode().then(resolve, resolve);
+              else resolve();
+            }
+            image.onload = finish;
+            image.onerror = resolve;
+            image.src = new URL(source.getAttribute('src'), indexUrl).href;
+            if (image.complete) finish();
+          });
         });
+        return Promise.all(images);
       })
-      .catch(function () {});
+      .catch(function () {})
+      .then(function () { warmComplete = true; });
+    return warmPromise;
   }
-  function whenIdle() {
-    if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 4000 });
-    else setTimeout(warm, 1500);
+
+  var exitLink = document.querySelector('.exit-fab');
+  if (exitLink) {
+    if (allowIntentPrefetch) {
+      exitLink.addEventListener('pointerenter', warm, { once: true });
+      exitLink.addEventListener('focus', warm, { once: true });
+    }
+    exitLink.addEventListener('click', function (event) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || warmComplete) return;
+      event.preventDefault();
+      exitLink.classList.add('is-open');
+      exitLink.setAttribute('aria-busy', 'true');
+      exitLink.setAttribute('aria-label', 'Loading projects');
+      var label = exitLink.querySelector('.exit-fab-label');
+      if (label) label.textContent = 'Loading projects...';
+      warm().then(function () { window.location.assign(exitLink.href); });
+    });
   }
-  if (document.readyState === 'complete') whenIdle();
-  else window.addEventListener('load', whenIdle);
 })();
