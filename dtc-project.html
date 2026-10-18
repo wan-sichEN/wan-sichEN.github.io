@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Tele — DTC Project — Alexander Wan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Keep the page invisible until the web fonts have loaded, then fade it in,
+  // so text never flashes in a fallback font and then changes shape.
+  (function() {
+    var root = document.documentElement;
+    root.classList.add('fonts-loading');
+    var done = false;
+    function show() { if (done) return; done = true; root.classList.remove('fonts-loading'); }
+    setTimeout(show, 2000); // safety net
+    if (document.fonts && document.fonts.load) {
+      Promise.all([
+        document.fonts.load('400 16px "Space Grotesk"'),
+        document.fonts.load('700 16px "Space Grotesk"'),
+        document.fonts.load('400 16px "IBM Plex Sans"'),
+        document.fonts.load('500 16px "IBM Plex Sans"'),
+        document.fonts.load('600 16px "IBM Plex Sans"'),
+        document.fonts.load('400 16px "IBM Plex Mono"'),
+        document.fonts.load('600 16px "IBM Plex Mono"'),
+        document.fonts.load('400 16px "Architects Daughter"')
+      ]).then(function() { return document.fonts.ready; }).then(show, show);
+    } else { show(); }
+  })();
+</script>
+<style>
+  /* No rule under section headers */
+  .report-subhead { border-bottom: none; padding-bottom: 0; }
+
+  /* Bold "Fig. N" in captions */
+  .carousel-caption strong { font-weight: 600; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html#top" class="nav-mark"><img src="images/Logo-NoBackground.webp" alt="Logo"></a>
+    
+    <div class="nav-tabs">
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Floating exit button: stays on screen while scrolling; opens with its label, then collapses to the icon -->
+<a class="exit-fab is-open" href="index.html#the-tele" aria-label="Back to projects">
+  <span class="exit-fab-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  </span>
+  <span class="exit-fab-label" aria-hidden="true">Back to projects</span>
+</a>
+
+<!-- ============ DTC FULL REPORT ============ -->
+<section id="dtc-report" class="wrap">
+
+  <div class="report-header">
+    <div class="report-header-text">
+      <div>
+        <!-- <span class="label">Full Report</span> -->
+        <h2 class="report-title">The Tele</h2>
+        <p class="report-subtitle">Designed a one-handed diaper-changing station for patients with hemiplegia.</p>
+      </div>
+
+      <div class="sheet-meta" style="margin-top: 14px;">
+        <span>Year: <span class="hl-black">2024</span></span>
+        <span>Status: <span class="hl-black">Complete</span></span>
+      </div>
+    </div>
+
+    <div class="report-header-photo">
+      <img src = "images/DTC1/The_Tele.webp" alt = "The Tele">
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <h3 class="report-subhead">Overview</h3>
+    <p><span class="hl-black">Hemiplegia</span> describes the partial or complete paralysis of one side of the body, which makes two-handed tasks much more difficult.</p>
+    <p>Mrs. Brianne Trainor, a physical therapist at the Ascension Alexian Brothers Rehabilitation Hospital, was looking for a way to help her patients with hemiplegia be able to change a baby's diaper, a normally two-handed task. Such a solution would give them greater independence when taking care of their baby.</p>
+    <p>In the first Design Thinking &amp; Communications (DTC) course, I worked with a team of 4 to design a lightweight, one-hand-friendly diaper-changing assistor. Our solution, &ldquo;The Tele&rdquo;, is a portable changing station with a metal telescoping mechanism that securely lifts the baby's legs during diapering.</p>
+
+    <h3 class="report-subhead">Design Process</h3>
+    <p>I led secondary research of our users and the diaper changing process, allowing us to define initial design and safety requirements. We also conducted research on existing diaper-changing products for design ideation. Then, we interviewed our client to define their specific needs. The three primary requirements were:</p>
+    <ul class="report-list">
+      <li>Ease of use with one hand</li>
+      <li>Accessibility to diaper area</li>
+      <li>Portability</li>
+    </ul>
+    <p>From the start, we planned to have a leg-lifting mechanism that replicated the range of a second hand during diaper changing. Throughout the project, we would build mockups in the shop and bring them to the hospital for user testing (<span class="figure-link" onclick="goToFigure(0)">Fig. 1</span>).</p>
+    <p>For our final prototype, I proposed a widened luggage handle as the lifting mechanism, which would allow for stable and variable height adjustment at the press of a button and is durable enough to withstand baby kicks. See <span class="figure-link" onclick="goToFigure(1)">Fig. 2</span> for an exploded view I drew of the luggage mechanism.
+      I led the design of the widened luggage handlebar in Onshape CAD (<span class="figure-link" onclick="goToFigure(2)">Fig. 3</span>), which we then 3D-printed. In the shop, we used the bandsaw to cut an existing luggage handle to size and drilled additional holes for variable height adjustment. We selected high density polyethylene plastic as the base material against traditional PVC plastic due to medical concerns over PVC. Finally, we connected the base and luggage mechanism with a pair of locking hinges and screws.</p>
+    <p>We delivered our final prototype to our client, along with a technical report detailing the design process, instructions for construction, and instructions for use. Additionally, we presented our design to students and faculty at the DTC expo (<span class="figure-link" onclick="goToFigure(3)">Fig. 4</span>). See <span class="figure-link" onclick="goToFigure(4)">Fig. 5</span> for how a baby would use this mechanism.</p>
+
+    <h3 class="report-subhead">Gallery</h3>
+    <div class="report-carousel" id="dtcCarousel">
+      <div class="carousel-frame">
+        <button class="carousel-btn carousel-prev" aria-label="Previous image">&#10094;</button>
+        <div class="carousel-slides">
+          <div class="carousel-slide active" data-caption="Fig. 1 — Early mockup with test doll" style="background:#fff; padding:0;">
+            <img src="images/DTC1/DTC_Mockup.webp" alt="Early mockup of the diaper-changing station with a test doll" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+          <div class="carousel-slide" data-caption="Fig. 2 — Exploded view of the mechanism" style="background:#fff; padding:0;">
+            <img src="images/DTC1/Tele_Exploded_View.jpg" alt="Hand-drawn exploded view of the luggage handle mechanism" style="width:100%; height:100%; object-fit:contain;">
+          </div>
+          <div class="carousel-slide" data-caption="Fig. 3 — Onshape CAD model" style="background:#fff; padding:0;">
+            <img src="images/DTC1/Tele_Handle_CAD.webp" alt="Onshape CAD exploded view of the widened handlebar">
+          </div>
+          <div class="carousel-slide" data-caption="Fig. 4 — Poster for DTC expo" style="background:#fff; padding:0;">
+            <img src="images/DTC1/DTC_Final_Poster.webp" alt="DTC Design Fair poster for The Tele">
+          </div>
+          <div class="carousel-slide" data-caption="Fig. 5 — Test doll using luggage handle mechanism" style="background:#fff; padding:0;">
+            <img src="images/DTC1/Tele_w_baby.webp" alt="Test doll with legs held by The Tele">
+          </div>
+        </div>
+        <button class="carousel-btn carousel-next" aria-label="Next image">&#10095;</button>
+      </div>
+      <p class="carousel-caption" id="dtcCarouselCaption"><strong>Fig. 1</strong> — Early mockup with test doll</p>
+      <div class="carousel-dots" id="dtcCarouselDots"></div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var root = document.getElementById('dtcCarousel');
+  if (!root) return;
+  var slides = Array.prototype.slice.call(root.querySelectorAll('.carousel-slide'));
+  var dotsWrap = document.getElementById('dtcCarouselDots');
+  var captionEl = document.getElementById('dtcCarouselCaption');
+
+    function setCaption(text) {
+      captionEl.innerHTML = text.replace(/^(Fig\. \d+)/, '<strong>$1</strong>');
+    }
+  var current = 0;
+
+  slides.forEach(function(slide, i) {
+    var dot = document.createElement('button');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to image ' + (i + 1) + ' of ' + slides.length);
+    dot.addEventListener('click', function() { goTo(i); });
+    dotsWrap.appendChild(dot);
+  });
+
+  function goTo(i) {
+    slides[current].classList.remove('active');
+    dotsWrap.children[current].classList.remove('active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dotsWrap.children[current].classList.add('active');
+    setCaption(slides[current].getAttribute('data-caption'));
+  }
+
+  // Make the carousel accessible from Fig. X links in the report
+  window.goToFigure = function(i) {
+    goTo(i);
+    root.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  root.querySelector('.carousel-prev').addEventListener('click', function() { goTo(current - 1); });
+  root.querySelector('.carousel-next').addEventListener('click', function() { goTo(current + 1); });
+
+  setCaption(slides[0].getAttribute('data-caption'));
+})();
+</script>
+<script>
+// Exit button: show the full "Back to all projects" label first, then shrink to the arrow
+// and slide it under the nav logo.
+(function() {
+  var fab = document.querySelector('.exit-fab');
+  if (!fab) return;
+  var logo = document.querySelector('.nav-mark img');
+
+  // Center the collapsed arrow on the logo's center line.
+  function alignToLogo() {
+    if (!logo) return;
+    var r = logo.getBoundingClientRect();
+    if (r.width > 0) fab.style.setProperty('--logo-cx', (r.left + r.width / 2) + 'px');
+  }
+  alignToLogo();
+  if (logo && !logo.complete) logo.addEventListener('load', alignToLogo);
+  window.addEventListener('resize', alignToLogo);
+
+  var closed = false;
+  function collapse() {
+    if (closed) return; closed = true;
+    alignToLogo();
+    fab.classList.remove('is-open');
+  }
+  setTimeout(collapse, 0); // safety net
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(function() { setTimeout(collapse, 0); });   // starts counting once the page has faded in
+})();
+</script>
+<script src="lightbox.js" defer></script>
+</body>
+</html>

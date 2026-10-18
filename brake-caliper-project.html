@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bicycle Brake Caliper — ME240 Project — Alexander Wan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Keep the page invisible until the web fonts have loaded, then fade it in,
+  // so text never flashes in a fallback font and then changes shape.
+  (function() {
+    var root = document.documentElement;
+    root.classList.add('fonts-loading');
+    var done = false;
+    function show() { if (done) return; done = true; root.classList.remove('fonts-loading'); }
+    setTimeout(show, 2000); // safety net
+    if (document.fonts && document.fonts.load) {
+      Promise.all([
+        document.fonts.load('400 16px "Space Grotesk"'),
+        document.fonts.load('700 16px "Space Grotesk"'),
+        document.fonts.load('400 16px "IBM Plex Sans"'),
+        document.fonts.load('500 16px "IBM Plex Sans"'),
+        document.fonts.load('600 16px "IBM Plex Sans"'),
+        document.fonts.load('400 16px "IBM Plex Mono"'),
+        document.fonts.load('600 16px "IBM Plex Mono"'),
+        document.fonts.load('400 16px "Architects Daughter"')
+      ]).then(function() { return document.fonts.ready; }).then(show, show);
+    } else { show(); }
+  })();
+</script>
+<style>
+  /* Additions for this page only (kept here so style.css stays untouched).
+     If you'd rather, move these into style.css next to the other .report-* rules. */
+  .report-title.long { font-size: clamp(2.8rem, 6.5vw, 5.6rem); line-height: 0.95; }
+
+  /* Text on the left, media (carousel / video / diagram) on the right */
+  .report-split { display: flex; gap: 40px; align-items: flex-start; }
+  .report-split-text { flex: 1 1 0; min-width: 0; }
+  .report-split .report-carousel,
+  .report-split .report-media { flex: 0 0 48%; min-width: 0; margin-top: 0; }
+  .report-split.center-media { align-items: center; }
+  .report-split .carousel-frame { gap: 8px; }
+  .report-split .carousel-btn { width: 34px; height: 34px; font-size: 0.9rem; }
+
+  /* Single video / image frame, styled like the carousel frame */
+  .report-media-frame {
+    aspect-ratio: 4/3; border: none; border-radius: var(--radius); overflow: hidden;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px;
+    background: repeating-linear-gradient(45deg, #E4E5DF, #E4E5DF 10px, #DBDCD5 10px, #DBDCD5 20px);
+  }
+  .report-media-frame img,
+  .report-media-frame video { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+  /* Numbered steps */
+  .report-steps { list-style: none; counter-reset: step; margin: 0 0 18px; padding: 0; }
+  .report-steps li { counter-increment: step; position: relative; padding-left: 38px; margin-bottom: 10px; }
+  .report-steps li::before {
+    content: counter(step) ".";
+    position: absolute; left: 0;
+    font-family: 'IBM Plex Mono', monospace; color: var(--orange);
+  }
+
+  .report-body code {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; color: var(--ink);
+    background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; overflow-wrap: anywhere;
+  }
+  .report-body a.text-link { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+
+
+
+  /* Full-width galleries: wider frame, same height as the 720x540 default (16:9 at 960px = 540px tall) */
+  .report-body > .report-carousel .carousel-slides { max-width: 960px; aspect-ratio: 16/9; }
+
+  @media (max-width: 900px) {
+    .report-split { flex-direction: column; gap: 20px; }
+    .report-split .report-carousel,
+    .report-split .report-media { flex: 1 1 auto; width: 100%; }
+  }
+
+  /* Static figures (same row), shared by the Design Process section */
+  /* Images in a row share the same height and line up on their centres:
+     each figure's width is proportional to its image's aspect ratio (--r), and --row-max
+     stops the row from getting taller than ~500px on wide screens. */
+  .report-figrow { display: flex; gap: 28px; align-items: center; margin: 10px auto 28px; max-width: var(--row-max, none); }
+  .report-fig { flex: 1 1 0; min-width: 0; }
+  @media (min-width: 701px) { .report-figrow .report-fig { flex: var(--r, 1) 1 0; } }
+  .report-fig.single { flex: none; max-width: 760px; margin: 10px auto 28px; }
+  .fig-frame { overflow: hidden; }
+  .fig-frame img { width: 100%; height: auto; display: block; }
+  .report-fig .carousel-caption { margin-top: 8px; text-align: center; }
+  @media (max-width: 700px) {
+    .report-figrow { flex-direction: column; gap: 24px; max-width: none; }
+  }
+
+  /* No rule under section headers */
+  .report-subhead { border-bottom: none; padding-bottom: 0; }
+
+  /* Bold "Fig. N" in captions */
+  .carousel-caption strong { font-weight: 600; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html#top" class="nav-mark"><img src="images/Logo-NoBackground.webp" alt="Logo"></a>
+
+    <div class="nav-tabs">
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Floating exit button: stays on screen while scrolling; opens with its label, then collapses to the icon -->
+<a class="exit-fab is-open" href="index.html#brake-caliper" aria-label="Back to projects">
+  <span class="exit-fab-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  </span>
+  <span class="exit-fab-label" aria-hidden="true">Back to projects</span>
+</a>
+
+<!-- ============ BRAKE CALIPER FULL REPORT ============ -->
+<!-- id stays "dtc-report" so the existing #dtc-report padding/scroll rules in style.css apply -->
+<section id="dtc-report" class="wrap">
+
+  <div class="report-header">
+    <div class="report-header-text">
+      <div>
+        <h2 class="report-title">Brake Caliper</h2>
+        <p class="report-subtitle">Designed and optimized a lightweight bicycle brake caliper to meet ISO braking standards.</p>
+      </div>
+
+      <div class="sheet-meta" style="margin-top: 14px;">
+        <span>Year: <span class="hl-black">2026</span></span>
+        <span>Status: <span class="hl-black">Complete</span></span>
+      </div>
+    </div>
+
+    <div class="report-header-photo">
+      <img src="images/BrakeCalipers/Brakes_On_Bike.webp" alt="3D-printed brake calipers mounted on a bicycle" style="object-fit:cover; object-position:50% 50%;">
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <h3 class="report-subhead">Overview</h3>
+    <p>For ME240: Intro to Mechanical Design and Manufacturing, my team and I were tasked with designing brake calipers made from <span class="hl-black">SLS Nylon 12</span> for the rear wheel of a bicycle.</p>
+    <p>The goal was to meet the <span class="hl-black">ISO 4210-2</span> brake distance standard while minimizing weight. I served as Project Management Lead, but also took ownership of CAD, FEA and topology optimization, and technical documentation efforts for the <span class="hl-black">left caliper</span>.</p>
+
+    <h3 class="report-subhead">Defining Requirements</h3>
+    <div class="report-split">
+      <div class="report-split-text">
+        <p>First, my team created a Needs Table and Metrics Table (<span class="figure-link" onclick="goToFigure(1)">Fig. 1</span>, <span class="figure-link" onclick="goToFigure(2)">2</span>, <span class="figure-link" onclick="goToFigure(3)">3</span>) based on market research of caliper brakes and ISO 4210-2 and 4210-4 requirements.</p>
+        <p>Additionally, my team defined a design space (<span class="figure-link" onclick="goToFigure(4)">Fig. 4</span>) constrained by the bike wheel, frame, and mounting points. This identified the physical boundaries of our calipers that we later used for CAD and simulation.</p>
+      </div>
+
+      <div class="report-carousel">
+        <div class="carousel-frame">
+          <button class="carousel-btn carousel-prev" aria-label="Previous image">&#10094;</button>
+          <div class="carousel-slides">
+            <div class="carousel-slide active" data-caption="Fig. 1: Needs Table" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/Needs_Table.webp" alt="Needs Table">
+          </div>
+            <div class="carousel-slide" data-caption="Fig. 2: Metrics Table" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/Metrics_Table.webp" alt="Metrics Table" loading="lazy">
+          </div>
+            <div class="carousel-slide" data-caption="Fig. 3: Sources Table" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/Sources_Table.webp" alt="Sources Table" loading="lazy">
+          </div>
+            <div class="carousel-slide" data-caption="Fig. 4: Design space" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/Design_Space.webp" alt="Design space sketch" loading="lazy">
+          </div>
+          </div>
+          <button class="carousel-btn carousel-next" aria-label="Next image">&#10095;</button>
+        </div>
+        <p class="carousel-caption"></p>
+        <div class="carousel-dots"></div>
+      </div>
+    </div>
+
+    <h3 class="report-subhead">Design Process</h3>
+    <p>I led hand calculations to determine the loads experienced by both caliper brakes for simulation. These were a maximum tension force of <span class="hl-black">360 N</span> and friction force of <span class="hl-black">202.36 N</span>. Using these values, my team ran topology optimization (<span class="figure-link" onclick="goToFigure(5)">Fig. 5</span>, <span class="figure-link" onclick="goToFigure(6)">6</span>) on each caliper&rsquo;s design space to identify areas where material should be retained to maximize stiffness and where it could be removed to reduce weight and cost. The results reaffirmed our approach of removing material from the caliper interiors, which contribute less to structural stiffness, while adding material to the outer edges.</p>
+
+    <div class="report-figrow" style="--row-max: 1731px;">
+      <div class="report-fig" data-fig="5" style="--r: 1.5343;">
+        <div class="fig-frame"><img src="images/BrakeCalipers/TO_Left.webp" alt="Topology optimization of the left caliper" width="1410" height="919"></div>
+        <p class="carousel-caption"><strong>Fig. 5:</strong> Topology optimization — left caliper</p>
+      </div>
+      <div class="report-fig" data-fig="6" style="--r: 1.8713;">
+        <div class="fig-frame"><img src="images/BrakeCalipers/TO_Right.webp" alt="Topology optimization of the right caliper" width="1323" height="707"></div>
+        <p class="carousel-caption"><strong>Fig. 6:</strong> Topology optimization — right caliper</p>
+      </div>
+    </div>
+    <p>Using these design choices, our initial test design achieved maximum stresses of ~30 MPa in relevant regions (<span class="figure-link" onclick="goToFigure(7)">Fig. 7</span>, <span class="figure-link" onclick="goToFigure(8)">8</span>), below the 50 MPa yield strength of Nylon 12 but above our calculated 27.41 MPa fatigue strength. Total deflection was 6.222 mm (<span class="figure-link" onclick="goToFigure(9)">Fig. 9</span>), below the 11 mm allowable limit. Regional stresses exceeding 50 MPa near the pivot points were attributed to unphysical constraint behavior and excluded from evaluation.</p>
+
+    <div class="report-figrow" style="--row-max: 1247px;">
+      <div class="report-fig" data-fig="7" style="--r: 1.0764;">
+        <div class="fig-frame"><img src="images/BrakeCalipers/FEA_Left1.webp" alt="Stress results for the initial left caliper" width="747" height="694"></div>
+        <p class="carousel-caption"><strong>Fig. 7:</strong> Stress — left caliper</p>
+      </div>
+      <div class="report-fig" data-fig="8" style="--r: 1.3624;">
+        <div class="fig-frame"><img src="images/BrakeCalipers/FEA_Right1.webp" alt="Stress results for the initial right caliper" width="1015" height="745"></div>
+        <p class="carousel-caption"><strong>Fig. 8:</strong> Stress — right caliper</p>
+      </div>
+    </div>
+
+    <div class="report-fig single" data-fig="9">
+      <div class="fig-frame"><img src="images/BrakeCalipers/Deflections1.webp" alt="Deflection results for the initial calipers" width="3126" height="1634"></div>
+      <p class="carousel-caption"><strong>Fig. 9:</strong> Deflection — left and right calipers</p>
+    </div>
+
+
+    <h3 class="report-subhead">Testing &amp; Iteration</h3>
+    <p>Our initial test design was 3D-printed and tested on a real bicycle according to ISO 4210-2. It was able to stop the bicycle in <span class="hl-black">9.9 m</span>, well below the 15 m ISO limit. We also measured the actual user input force to be around 150 N instead of 180 N, and used this value in subsequent simulations. This large braking margin allowed us to pursue further weight reduction while maintaining ISO compliance.</p>
+    <p>To reduce weight, I iteratively removed material from low-stress regions identified through FEA and refined areas where material removal caused excessive stress or deflection. After many iterations, we minimized the relevant stresses of the left and right caliper to 28.44 MPa and 35.37 MPa, respectively, while preserving our material-reduction changes (<span class="figure-link" onclick="goToFigure(10)">Fig. 10</span>, <span class="figure-link" onclick="goToFigure(11)">11</span>). See <span class="figure-link" onclick="goToFigure(12)">Fig. 12</span> for the caliper deflections, which are still within the allowable limit.</p>
+
+    <div class="report-carousel">
+      <div class="carousel-frame">
+        <button class="carousel-btn carousel-prev" aria-label="Previous image">&#10094;</button>
+        <div class="carousel-slides">
+          <div class="carousel-slide active" data-caption="Fig. 10: Final left caliper — design changes and stress" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/FEA_Left_Final.webp" alt="Design changes and stress results for the final left caliper" loading="lazy">
+          </div>
+          <div class="carousel-slide" data-caption="Fig. 11: Final right caliper — design changes and stress" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/FEA_Right_Final.webp" alt="Design changes and stress results for the final right caliper" loading="lazy">
+          </div>
+          <div class="carousel-slide" data-caption="Fig. 12: Final deflection — left and right calipers" style="background:#fff; padding:0;">
+            <img src="images/BrakeCalipers/Deflections_Final.webp" alt="Deflection results for the final calipers" loading="lazy">
+          </div>
+        </div>
+        <button class="carousel-btn carousel-next" aria-label="Next image">&#10095;</button>
+      </div>
+      <p class="carousel-caption"></p>
+      <div class="carousel-dots"></div>
+    </div>
+
+    <p style="margin-top: 28px;">Our final design (<span class="figure-link" onclick="goToFigure(13)">Fig. 13</span>, <span class="figure-link" onclick="goToFigure(14)">14</span>) achieved:</p>
+    <ul class="report-list">
+      <li><span class="hl-black">12.2 m</span> braking distance — a 23% increase while remaining ISO compliant</li>
+      <li><span class="hl-black">59.2 g</span> total weight — 13.2% lighter than our initial design and 42.2 g lighter than the lightest industry benchmark identified</li>
+      <li><span class="hl-black">$5.92</span> manufacturing cost — $0.93 lower than our initial design and $2.08 below the cheapest industry benchmark identified</li>
+    </ul>
+    <p>Future iterations would focus on further reducing localized stresses to below the fatigue strength, so that the brakes can withstand the projected number of cycles.</p>
+
+    <div class="report-figrow" style="--row-max: 1361px;">
+      <div class="report-fig" data-fig="13" style="--r: 1.3333;">
+        <div class="fig-frame"><img src="images/BrakeCalipers/Right_Brake_Real.webp" alt="Manufactured right caliper" width="1008" height="756"></div>
+        <p class="carousel-caption"><strong>Fig. 13:</strong> Manufactured right caliper</p>
+      </div>
+      <div class="report-fig" data-fig="14" style="--r: 1.3333;">
+        <div class="fig-frame"><img src="images/BrakeCalipers/Left_Brake_Real.webp" alt="Manufactured left caliper" width="1008" height="756"></div>
+        <p class="carousel-caption"><strong>Fig. 14:</strong> Manufactured left caliper</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+// Initializes every carousel on the page independently
+(function() {
+  // Registry so "Fig. N" links in the text can jump to the right figure
+  var figures = {};
+  function scrollToEl(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.report-media[data-fig], .report-fig[data-fig]'), function(el) {
+    figures[el.getAttribute('data-fig')] = function() { scrollToEl(el); };
+  });
+
+  window.goToFigure = function(n) {
+    var go = figures[String(n)];
+    if (go) go();
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll('.report-carousel'), function(root) {
+    var slides = Array.prototype.slice.call(root.querySelectorAll('.carousel-slide'));
+    var dotsWrap = root.querySelector('.carousel-dots');
+    var captionEl = root.querySelector('.carousel-caption');
+
+    function setCaption(text) {
+      captionEl.innerHTML = text.replace(/^(Fig\. \d+)/, '<strong>$1</strong>');
+    }
+    var current = 0;
+
+    slides.forEach(function(slide, i) {
+      var dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to image ' + (i + 1) + ' of ' + slides.length);
+      dot.addEventListener('click', function() { goTo(i); });
+      dotsWrap.appendChild(dot);
+    });
+
+    function goTo(i) {
+      slides[current].classList.remove('active');
+      dotsWrap.children[current].classList.remove('active');
+      current = (i + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dotsWrap.children[current].classList.add('active');
+      setCaption(slides[current].getAttribute('data-caption'));
+    }
+
+    // Register each slide under its figure number (parsed from "Fig. N: ...")
+    slides.forEach(function(slide, i) {
+      var m = /^Fig\.\s*(\d+)/.exec(slide.getAttribute('data-caption') || '');
+      if (m) figures[m[1]] = function() { goTo(i); scrollToEl(root); };
+    });
+
+    root.querySelector('.carousel-prev').addEventListener('click', function() { goTo(current - 1); });
+    root.querySelector('.carousel-next').addEventListener('click', function() { goTo(current + 1); });
+
+    setCaption(slides[0].getAttribute('data-caption'));
+  });
+})();
+</script>
+<script>
+(function() {
+  var fab = document.querySelector('.exit-fab');
+  if (!fab) return;
+  var logo = document.querySelector('.nav-mark img');
+
+  // Center the collapsed arrow on the logo's center line.
+  function alignToLogo() {
+    if (!logo) return;
+    var r = logo.getBoundingClientRect();
+    if (r.width > 0) fab.style.setProperty('--logo-cx', (r.left + r.width / 2) + 'px');
+  }
+  alignToLogo();
+  if (logo && !logo.complete) logo.addEventListener('load', alignToLogo);
+  window.addEventListener('resize', alignToLogo);
+
+  var closed = false;
+  function collapse() {
+    if (closed) return; closed = true;
+    alignToLogo();
+    fab.classList.remove('is-open');
+  }
+  setTimeout(collapse, 0); // safety net
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(function() { setTimeout(collapse, 0); });   // starts counting once the page has faded in
+})();
+</script>
+<script src="lightbox.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulley Paradox — DTC Project — Alexander Wan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Keep the page invisible until the web fonts have loaded, then fade it in,
+  // so text never flashes in a fallback font and then changes shape.
+  (function() {
+    var root = document.documentElement;
+    root.classList.add('fonts-loading');
+    var done = false;
+    function show() { if (done) return; done = true; root.classList.remove('fonts-loading'); }
+    setTimeout(show, 2000); // safety net
+    if (document.fonts && document.fonts.load) {
+      Promise.all([
+        document.fonts.load('400 16px "Space Grotesk"'),
+        document.fonts.load('700 16px "Space Grotesk"'),
+        document.fonts.load('400 16px "IBM Plex Sans"'),
+        document.fonts.load('500 16px "IBM Plex Sans"'),
+        document.fonts.load('600 16px "IBM Plex Sans"'),
+        document.fonts.load('400 16px "IBM Plex Mono"'),
+        document.fonts.load('600 16px "IBM Plex Mono"'),
+        document.fonts.load('400 16px "Architects Daughter"')
+      ]).then(function() { return document.fonts.ready; }).then(show, show);
+    } else { show(); }
+  })();
+</script>
+<style>
+  /* Additions for this page only (kept here so style.css stays untouched). */
+  /* Text on the left, carousel on the right */
+  .report-split { display: flex; gap: 40px; align-items: flex-start; }
+  .report-split-text { flex: 1 1 0; min-width: 0; }
+  .report-split .report-carousel { flex: 0 0 40%; min-width: 0; margin-top: 0; }
+  /* Square frame hugs the cropped mockups (widest one fills the width) instead of a wide 4:3 box */
+  .report-split .carousel-slides { aspect-ratio: 1 / 1; }
+  .report-split .carousel-frame { gap: 8px; }
+  .report-split .carousel-btn { width: 34px; height: 34px; font-size: 0.9rem; }
+
+  /* No rule under section headers */
+  .report-subhead { border-bottom: none; padding-bottom: 0; }
+
+  /* Bold "Fig. N" in captions */
+  .report-body figcaption strong, .carousel-caption strong { font-weight: 600; color: var(--ink); }
+
+  /* Static figures (no carousel) */
+  .report-figs { display: flex; gap: 20px; margin: 24px 0; align-items: flex-start; }
+  .report-figs figure { flex: 1 1 0; min-width: 0; margin: 0; }
+  .report-figure { margin: 24px auto; max-width: 800px; }
+  .report-figure.is-wide { max-width: 760px; }
+  .report-body figure img { display: block; width: 100%; height: auto; background: #fff; border-radius: var(--radius); }
+  .report-body figcaption {
+    text-align: center; margin-top: 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--ink-soft); line-height: 1.4;
+  }
+
+  @media (max-width: 700px) {
+    .report-figs { flex-direction: column; }
+  }
+
+  @media (max-width: 900px) {
+    .report-split { flex-direction: column; gap: 20px; }
+    .report-split .report-carousel { flex: 1 1 auto; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html#top" class="nav-mark"><img src="images/Logo-NoBackground.webp" alt="Logo"></a>
+
+    <div class="nav-tabs">
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Floating exit button: stays on screen while scrolling; opens with its label, then collapses to the icon -->
+<a class="exit-fab is-open" href="index.html#pulley-paradox" aria-label="Back to projects">
+  <span class="exit-fab-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  </span>
+  <span class="exit-fab-label" aria-hidden="true">Back to projects</span>
+</a>
+
+<!-- ============ PULLEY-DRIVEN SCISSOR LIFT FULL REPORT ============ -->
+<!-- id stays "dtc-report" so the existing #dtc-report padding/scroll rules in style.css apply -->
+<section id="dtc-report" class="wrap">
+
+  <div class="report-header">
+    <div class="report-header-text">
+      <div>
+        <h2 class="report-title">Pulley Paradox</h2>
+        <p class="report-subtitle">Designed a portable, electronic-free lifting device to help a stroke survivor recover from falls.</p>
+      </div>
+
+      <div class="sheet-meta" style="margin-top: 14px;">
+        <span>Year: <span class="hl-black">2025</span></span>
+        <span>Status: <span class="hl-black">Complete</span></span>
+      </div>
+    </div>
+
+    <div class="report-header-photo">
+      <img src="images/DTC2/PulleyParadox.webp" alt="Pulley Paradox">
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <h3 class="report-subhead">Overview</h3>
+    <p>For my second Design Thinking &amp; Communications course, our team worked with Katy Morrison, Administrative Director for the Shirley Ryan AbilityLab, to develop a device that could help her father, Ed, recover from falls. Due to limited mobility from a stroke, Ed could not stand up from falls independently, while his primary caretaker, Kathy, could not lift him without assistance.</p>
+
+    <h3 class="report-subhead">Design Process</h3>
+    <div class="report-split">
+      <div class="report-split-text">
+        <p>We began with secondary user research and a client interview to better understand the problem and define device requirements. The main requirements were:</p>
+        <ul class="report-list">
+          <li>Portability</li>
+          <li>Floor accessibility</li>
+          <li>Capable of lifting person</li>
+          <li>Ease of operation</li>
+          <li>No cords, batteries, or crank mechanisms</li>
+        </ul>
+      </div>
+
+      <div class="report-carousel">
+        <div class="carousel-frame">
+          <button class="carousel-btn carousel-prev" aria-label="Previous image">&#10094;</button>
+          <div class="carousel-slides">
+            <div class="carousel-slide active" data-fig="1" data-caption="Fig. 1 — Fold-out ramp concept mockup" style="background:#fff; padding:0;">
+              <img src="images/DTC2/RampMockup.webp" alt="Fold-out ramp mockup" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div class="carousel-slide" data-fig="2" data-caption="Fig. 2 — Telescoping stairs concept mockup" style="background:#fff; padding:0;">
+              <img src="images/DTC2/TelescopingStairs.webp" alt="Telescoping stairs mockup" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div class="carousel-slide" data-fig="3" data-caption="Fig. 3 — Pulley-driven scissor lift concept mockup" style="background:#fff; padding:0;">
+              <img src="images/DTC2/ScissorLiftMockup.webp" alt="Pulley-driven scissor lift mockup" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+          </div>
+          <button class="carousel-btn carousel-next" aria-label="Next image">&#10095;</button>
+        </div>
+        <p class="carousel-caption"></p>
+        <div class="carousel-dots"></div>
+      </div>
+    </div>
+
+    <p style="margin-top: 28px;">Additionally, we conducted market research on products designed to lift people or heavy things for design ideation. We created mockups of several concepts, including a fold-out ramp (<span class="figure-link" onclick="goToFigure(1)">Fig. 1</span>), telescoping stairs (<span class="figure-link" onclick="goToFigure(2)">Fig. 2</span>), and a pulley-driven scissor lift (<span class="figure-link" onclick="goToFigure(3)">Fig. 3</span>). We selected the scissor lift because it offered compactness and high lifting capacity. Our initial mockup revealed uneven lifting caused by friction in our laser-cut pulleys, which we aimed to address with higher-quality pulleys in the final design.</p>
+    <p>I led <span class="hl-black">MATLAB-based force analysis</span> to model the required pulley force to lift the scissor lift throughout its range of motion (<span class="figure-link" onclick="goToFigure(4)">Fig. 4</span>, <span class="figure-link" onclick="goToFigure(5)">5</span>). The results led us to design the scissor lift with a minimum height of about 4 inches to balance floor accessibility with lifting force, and use 36 pulleys in order to lessen the mechanical load to a level operable by Kathy. I then helped translate these design choices into CAD for fabrication (<span class="figure-link" onclick="goToFigure(6)">Fig. 6</span>).</p>
+
+    <div class="report-figs">
+      <figure data-fig="4">
+        <img src="images/DTC2/ForcevsAngle.webp" alt="MATLAB plot of total pulley force vs. scissor arm angle">
+        <figcaption><strong>Fig. 4</strong> — Total pulley force vs. scissor arm angle</figcaption>
+      </figure>
+      <figure data-fig="5">
+        <img src="images/DTC2/ForcevsHeight.webp" alt="MATLAB plot of total pulley force vs. scissor lift height">
+        <figcaption><strong>Fig. 5</strong> — Total pulley force vs. scissor lift height</figcaption>
+      </figure>
+    </div>
+    <figure class="report-figure is-wide" data-fig="6">
+      <img src="images/DTC2/ScissorLiftCAD.webp" alt="CAD model of the scissor lift, collapsed and extended">
+      <figcaption><strong>Fig. 6</strong> — CAD of the scissor lift</figcaption>
+    </figure>
+    <p>For our final prototype (<span class="figure-link" onclick="goToFigure(7)">Fig. 7</span>), we fabricated the frame from aluminum using shop tools like the bandsaw, milling machine, drill press, and belt sander. We used steel pulleys and steel sliding door rail and wheel sets for a durable actuation system. A fold-out seat is also incorporated for comfort.</p>
+    <p>The final prototype revealed persisting friction and fabrication-tolerance issues, causing uneven lifting and instability during operation. For future iteration, we proposed using higher quality pulleys and tighter-tolerance manufacturing practices. The final design and findings were presented to our client through the prototype, technical report, and presentation.</p>
+
+    <figure class="report-figure" data-fig="7">
+      <img src="images/DTC2/FinishedPrototypeAndConstruction.webp" alt="Finished prototype, prototype without top frame and chair, pulley assembly, and bottom frame">
+      <figcaption><strong>Fig. 7</strong> — Final prototype</figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<script>
+// Initializes every carousel on the page independently
+(function() {
+  var carousels = [];
+
+  Array.prototype.forEach.call(document.querySelectorAll('.report-carousel'), function(root) {
+    var slides = Array.prototype.slice.call(root.querySelectorAll('.carousel-slide'));
+    var dotsWrap = root.querySelector('.carousel-dots');
+    var captionEl = root.querySelector('.carousel-caption');
+    var current = 0;
+
+    function setCaption(text) {
+      captionEl.innerHTML = text.replace(/^(Fig\. \d+)/, '<strong>$1</strong>');
+    }
+
+    slides.forEach(function(slide, i) {
+      var dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to image ' + (i + 1) + ' of ' + slides.length);
+      dot.addEventListener('click', function() { goTo(i); });
+      dotsWrap.appendChild(dot);
+    });
+
+    function goTo(i) {
+      slides[current].classList.remove('active');
+      dotsWrap.children[current].classList.remove('active');
+      current = (i + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dotsWrap.children[current].classList.add('active');
+      setCaption(slides[current].getAttribute('data-caption'));
+    }
+
+    root.querySelector('.carousel-prev').addEventListener('click', function() { goTo(current - 1); });
+    root.querySelector('.carousel-next').addEventListener('click', function() { goTo(current + 1); });
+
+    setCaption(slides[0].getAttribute('data-caption'));
+    carousels.push({ root: root, slides: slides, goTo: goTo });
+  });
+
+  // "Fig. N" links in the text jump to the matching slide in whichever carousel holds it
+  window.goToFigure = function(n) {
+    for (var c = 0; c < carousels.length; c++) {
+      for (var i = 0; i < carousels[c].slides.length; i++) {
+        if (carousels[c].slides[i].getAttribute('data-fig') === String(n)) {
+          carousels[c].goTo(i);
+          carousels[c].root.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+      }
+    }
+    var fig = document.querySelector('figure[data-fig="' + n + '"]');
+    if (fig) fig.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+})();
+</script>
+<script>
+// Exit button: show the full "Back to projects" label first, then shrink to the arrow
+// and slide it under the nav logo.
+(function() {
+  var fab = document.querySelector('.exit-fab');
+  if (!fab) return;
+  var logo = document.querySelector('.nav-mark img');
+
+  // Center the collapsed arrow on the logo's center line.
+  function alignToLogo() {
+    if (!logo) return;
+    var r = logo.getBoundingClientRect();
+    if (r.width > 0) fab.style.setProperty('--logo-cx', (r.left + r.width / 2) + 'px');
+  }
+  alignToLogo();
+  if (logo && !logo.complete) logo.addEventListener('load', alignToLogo);
+  window.addEventListener('resize', alignToLogo);
+
+  var closed = false;
+  function collapse() {
+    if (closed) return; closed = true;
+    alignToLogo();
+    fab.classList.remove('is-open');
+  }
+  setTimeout(collapse, 0); // safety net
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(function() { setTimeout(collapse, 0); });   // starts counting once the page has faded in
+})();
+</script>
+<script src="lightbox.js" defer></script>
+</body>
+</html>

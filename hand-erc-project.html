@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAND ERC — Project — Alexander Wan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Keep the page invisible until the web fonts have loaded, then fade it in,
+  // so text never flashes in a fallback font and then changes shape.
+  (function() {
+    var root = document.documentElement;
+    root.classList.add('fonts-loading');
+    var done = false;
+    function show() { if (done) return; done = true; root.classList.remove('fonts-loading'); }
+    setTimeout(show, 2000); // safety net
+    if (document.fonts && document.fonts.load) {
+      Promise.all([
+        document.fonts.load('400 16px "Space Grotesk"'),
+        document.fonts.load('700 16px "Space Grotesk"'),
+        document.fonts.load('400 16px "IBM Plex Sans"'),
+        document.fonts.load('500 16px "IBM Plex Sans"'),
+        document.fonts.load('600 16px "IBM Plex Sans"'),
+        document.fonts.load('400 16px "IBM Plex Mono"'),
+        document.fonts.load('400 16px "Architects Daughter"')
+      ]).then(function() { return document.fonts.ready; }).then(show, show);
+    } else { show(); }
+  })();
+</script>
+<style>
+  /* Additions for this page only (kept here so style.css stays untouched).
+     If you'd rather, move these into style.css next to the other .report-* rules. */
+  .report-title.long { font-size: clamp(2.8rem, 6.5vw, 5.6rem); line-height: 0.95; }
+
+  /* Text on the left, media (carousel / video) on the right */
+  .report-split { display: flex; gap: 40px; align-items: flex-start; }
+  .report-split-text { flex: 1 1 0; min-width: 0; }
+  .report-split .report-carousel,
+  .report-split .report-media { flex: 0 0 48%; min-width: 0; margin-top: 0; }
+
+  /* Single video / image frame, styled like the carousel frame */
+  .report-media-frame {
+    aspect-ratio: 4/3; border: 1px solid var(--ink); border-radius: var(--radius); overflow: hidden;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px;
+    background: repeating-linear-gradient(45deg, #E4E5DF, #E4E5DF 10px, #DBDCD5 10px, #DBDCD5 20px);
+  }
+  .report-media-frame img,
+  .report-media-frame video { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+  .report-quote {
+    margin: 0 0 22px; padding-left: 18px; border-left: 3px solid var(--orange);
+    font-size: 1.15em; font-style: italic;
+  }
+  .report-body a.text-link { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 900px) {
+    .report-split { flex-direction: column; gap: 20px; }
+    .report-split .report-carousel,
+    .report-split .report-media { flex: 1 1 auto; width: 100%; }
+  }
+
+
+  /* Figures */
+  .report-figrow { display: flex; gap: 28px; align-items: flex-start; margin: 28px auto; max-width: 760px; }
+  .report-figrow.wide { max-width: 900px; }
+  .report-figrow .report-fig { min-width: 0; }
+  .report-fig.narrow { max-width: 560px; margin: 28px auto; }
+  .report-fig.mid { max-width: 640px; margin: 28px auto; }
+  .report-fig.triple { max-width: 760px; margin: 28px auto; }
+  .fig-frame { overflow: hidden; }
+  .fig-frame img { width: 100%; height: auto; display: block; }
+  .fig-row { display: flex; gap: 28px; align-items: flex-start; }
+  .fig-row > div { min-width: 0; }
+  .ba-label { display: block; text-align: center; margin-top: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .report-fig .carousel-caption { margin-top: 8px; text-align: center; }
+  .carousel-caption strong { font-weight: 600; color: var(--ink); }
+  .report-split .report-media .carousel-caption { text-align: center; }
+
+  /* Bare video embed: no frame, border or background */
+  .video-frame { width: 100%; aspect-ratio: 16/9; }
+  .video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+  @media (max-width: 700px) {
+    .report-figrow, .fig-row { flex-direction: column; gap: 24px; }
+    .report-figrow .report-fig, .fig-row > div { flex: 1 1 auto !important; width: 100%; }
+  }
+
+  /* Hero photo fills its frame edge to edge (flush with the right margin); crop is centred on the hand */
+  .report-header-photo img { object-fit: cover; object-position: 50% 30%; }
+
+  /* No rule under section headers */
+  .report-subhead { border-bottom: none; padding-bottom: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html#top" class="nav-mark"><img src="images/Logo-NoBackground.webp" alt="Logo"></a>
+
+    <div class="nav-tabs">
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Floating exit button: stays on screen while scrolling; opens with its label, then collapses to the icon -->
+<a class="exit-fab is-open" href="index.html#hand-erc" aria-label="Back to projects">
+  <span class="exit-fab-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  </span>
+  <span class="exit-fab-label" aria-hidden="true">Back to projects</span>
+</a>
+
+<!-- ============ HAND ERC FULL REPORT ============ -->
+<!-- id stays "dtc-report" so the existing #dtc-report padding/scroll rules in style.css apply -->
+<section id="dtc-report" class="wrap">
+
+  <div class="report-header">
+    <div class="report-header-text">
+      <div>
+        <h2 class="report-title long">HAND ERC</h2>
+        <p class="report-subtitle">Redesigned an open-source robotic hand as a test platform for novel tactile sensors.</p>
+      </div>
+
+      <div class="sheet-meta" style="margin-top: 14px;">
+        <span>Year: <span class="hl-black">2024&ndash;Present</span></span>
+        <span>Status: <span class="hl-black">Ongoing</span></span>
+      </div>
+    </div>
+
+    <div class="report-header-photo">
+      <img src="images/HANDERC/RedesignedNanoHand.webp" alt="Redesigned Nano Hand">
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <h3 class="report-subhead">Overview</h3>
+    <div class="report-split">
+      <div class="report-split-text">
+        <p class="report-quote">&ldquo;Robot hands are the interface that transform modern AI to useful physical work.&rdquo;</p>
+        <p><a class="text-link" href="https://hand-erc.org/" target="_blank" rel="noopener">HAND ERC</a> is a Northwestern research center focused on developing versatile, dexterous robot hands. As an undergraduate research assistant, I supported the development of novel <span class="hl-black">tactile hand sensors</span> by modifying and building an open-source robotic hand as a test platform (<a class="figure-link" href="#fig-1">Fig.&nbsp;1</a>).</p>
+      </div>
+
+      <div class="report-media" id="fig-1">
+        <div class="video-frame">
+          <iframe src="https://www.youtube.com/embed/kCV66GzrXGE" title="Redesigned Nano Hand wiggling" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+        </div>
+        <p class="carousel-caption"><strong>Fig. 1:</strong> Redesigned Nano Hand in motion</p>
+      </div>
+    </div>
+
+    <p style="margin-top: 28px;">After researching existing open-source robotic hands, I selected the <a class="text-link" href="https://robotnanohand.com/" target="_blank" rel="noopener">Robot Nano Hand</a> as the platform for redesign and testing. To increase sensor surface area, I used Fusion 360 to fill all gaps in the palm and reposition the thumb connection and motor housing (<a class="figure-link" href="#fig-2">Fig.&nbsp;2</a>). These changes required further redesigns to remove interfering geometry and resolve clearance issues (<a class="figure-link" href="#fig-3">Fig.&nbsp;3</a>). I then 3D-printed the parts and fully assembled the redesigned Nano Hand.</p>
+
+    <div class="report-figrow wide">
+      <div class="report-fig" id="fig-2" style="flex: 1.778 1 0;">
+        <div class="fig-frame"><img src="images/HANDERC/HandCADChanges.webp" alt="Original Nano Hand next to the CAD model, with the palm gaps and 11mm thumb offset highlighted" width="1440" height="810"></div>
+        <p class="carousel-caption"><strong>Fig. 2:</strong> CAD changes to the Nano Hand</p>
+      </div>
+      <div class="report-fig" id="fig-3" style="flex: 0.65 1 0;">
+        <div class="fig-frame"><img src="images/HANDERC/HandClearanceIssues.webp" alt="CAD side view with a red circle marking a clearance issue" width="624" height="960"></div>
+        <p class="carousel-caption"><strong>Fig. 3:</strong> Clearance issue example during redesign</p>
+      </div>
+    </div>
+
+    <p>Next, I began designing a 3D-printed <span class="hl-black">silicone mold</span> to cast continuous, hollow silicone skin around the Nano Hand. The skin is intended to reduce mechanical noise picked up by the sensors from the roughness of the hand&rsquo;s PLA surfaces. I first used Blender to model the organic skin geometry and mold core (<a class="figure-link" href="#fig-4">Fig.&nbsp;4</a>, <a class="figure-link" href="#fig-5">5</a>), then exported the models to Fusion 360 and used Boolean subtraction to create the mold. The complex core geometry created clearance issues during assembly, requiring me to divide the mold into multiple pieces (<a class="figure-link" href="#fig-6">Fig.&nbsp;6</a>).</p>
+
+    <div class="report-figrow">
+      <div class="report-fig" id="fig-4" style="flex: 0.936 1 0;">
+        <div class="fig-frame"><img src="images/HANDERC/SiliconeSkin.webp" alt="Blender model of the smooth silicone skin geometry" width="1266" height="1352"></div>
+        <p class="carousel-caption"><strong>Fig. 4:</strong> Silicone skin geometry in Blender</p>
+      </div>
+      <div class="report-fig" id="fig-5" style="flex: 1.03 1 0;">
+        <div class="fig-frame"><img src="images/HANDERC/MoldCore.webp" alt="Blender model of the faceted mold core" width="1308" height="1270"></div>
+        <p class="carousel-caption"><strong>Fig. 5:</strong> Mold core in Blender</p>
+      </div>
+    </div>
+
+    <div class="report-fig mid" id="fig-6">
+      <div class="fig-frame"><img src="images/HANDERC/SiliconeMoldCAD.webp" alt="Exploded view of the multi-piece silicone mold CAD around the hand core" width="1502" height="1296"></div>
+      <p class="carousel-caption"><strong>Fig. 6:</strong> Silicone mold CAD, exploded view</p>
+    </div>
+
+    <p>Additionally, I redesigned the finger linkages to route the tendons lower to prevent contact with the silicone skin during actuation (<a class="figure-link" href="#fig-7">Fig.&nbsp;7</a>).</p>
+
+    <div class="report-fig triple" id="fig-7">
+      <div class="fig-row">
+        <div style="flex: 0.8 1 0;">
+          <div class="fig-frame"><img src="images/HANDERC/TendonBefore.webp" alt="Before: tendon routed high along the finger, with the contact area boxed in red" width="768" height="960"></div>
+          <span class="ba-label">Before</span>
+        </div>
+        <div style="flex: 0.8 1 0;">
+          <div class="fig-frame"><img src="images/HANDERC/TendonAfter.webp" alt="After: tendon routed lower inside the finger" width="768" height="960"></div>
+          <span class="ba-label">After</span>
+        </div>
+        <div style="flex: 0.51 1 0;">
+          <div class="fig-frame"><img src="images/HANDERC/LinkageCAD.webp" alt="CAD of the redesigned finger linkage" width="688" height="1350"></div>
+          <span class="ba-label">Linkage CAD</span>
+        </div>
+      </div>
+      <p class="carousel-caption"><strong>Fig. 7:</strong> Finger linkage redesign</p>
+    </div>
+
+  </div>
+</section>
+
+<script>
+// Exit button: show the full "Back to all projects" label first, then shrink to the arrow
+// and slide it under the nav logo.
+(function() {
+  var fab = document.querySelector('.exit-fab');
+  if (!fab) return;
+  var logo = document.querySelector('.nav-mark img');
+
+  // Center the collapsed arrow on the logo's center line.
+  function alignToLogo() {
+    if (!logo) return;
+    var r = logo.getBoundingClientRect();
+    if (r.width > 0) fab.style.setProperty('--logo-cx', (r.left + r.width / 2) + 'px');
+  }
+  alignToLogo();
+  if (logo && !logo.complete) logo.addEventListener('load', alignToLogo);
+  window.addEventListener('resize', alignToLogo);
+
+  var closed = false;
+  function collapse() {
+    if (closed) return; closed = true;
+    alignToLogo();
+    fab.classList.remove('is-open');
+  }
+  setTimeout(collapse, 0); // safety net
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(function() { setTimeout(collapse, 0); });   // starts counting once the page has faded in
+})();
+</script>
+<script>
+// Fig. links: smooth scroll with the figure centred in the window
+(function() {
+  Array.prototype.forEach.call(document.querySelectorAll('a.figure-link[href^="#fig-"]'), function(a) {
+    a.addEventListener('click', function(e) {
+      var target = document.getElementById(a.getAttribute('href').slice(1));
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+})();
+</script>
+<script src="lightbox.js" defer></script>
+</body>
+</html>

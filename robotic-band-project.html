@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robotic Band — NURC — Alexander Wan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Keep the page invisible until the web fonts have loaded, then fade it in,
+  // so text never flashes in a fallback font and then changes shape.
+  (function() {
+    var root = document.documentElement;
+    root.classList.add('fonts-loading');
+    var done = false;
+    function show() { if (done) return; done = true; root.classList.remove('fonts-loading'); }
+    setTimeout(show, 2000); // safety net
+    if (document.fonts && document.fonts.load) {
+      Promise.all([
+        document.fonts.load('400 16px "Space Grotesk"'),
+        document.fonts.load('700 16px "Space Grotesk"'),
+        document.fonts.load('400 16px "IBM Plex Sans"'),
+        document.fonts.load('500 16px "IBM Plex Sans"'),
+        document.fonts.load('600 16px "IBM Plex Sans"'),
+        document.fonts.load('400 16px "IBM Plex Mono"'),
+        document.fonts.load('400 16px "Architects Daughter"')
+      ]).then(function() { return document.fonts.ready; }).then(show, show);
+    } else { show(); }
+  })();
+</script>
+<style>
+  /* Additions for this page only (kept here so style.css stays untouched).
+     If you'd rather, move these into style.css next to the other .report-* rules. */
+  .report-title.long { font-size: clamp(2.8rem, 6.5vw, 5.6rem); line-height: 0.95; }
+
+  /* Text on the left, media (carousel / video) on the right */
+  .report-split { display: flex; gap: 40px; align-items: flex-start; }
+  .report-split-text { flex: 1 1 0; min-width: 0; }
+  .report-split .report-carousel,
+  .report-split .report-media { flex: 0 0 48%; min-width: 0; margin-top: 0; }
+
+  /* Single video / image frame, styled like the carousel frame */
+  .report-media-frame {
+    aspect-ratio: 4/3; border: 1px solid var(--ink); border-radius: var(--radius); overflow: hidden;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px;
+    background: repeating-linear-gradient(45deg, #E4E5DF, #E4E5DF 10px, #DBDCD5 10px, #DBDCD5 20px);
+  }
+  .report-media-frame img,
+  .report-media-frame video { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+  /* Videos inside carousel slides */
+  .carousel-slide video { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  @media (max-width: 900px) {
+    .report-split { flex-direction: column; gap: 20px; }
+    .report-split .report-carousel,
+    .report-split .report-media { flex: 1 1 auto; width: 100%; }
+  }
+
+
+  /* Figure rows: two figures side by side, or one wide figure */
+  .report-figrow { display: flex; gap: 28px; align-items: flex-start; margin: 28px 0; }
+  .report-figrow .report-fig { flex: 1 1 0; min-width: 0; }
+  .report-fig.single { max-width: 760px; margin: 28px auto; }
+  .report-fig.single .report-media-frame { aspect-ratio: 16/9; }
+  .report-media-frame.wide { aspect-ratio: 16/9; }
+  .report-media-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .report-media-frame.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ba-half { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: 0; height: 100%; }
+  .ba-half img { max-width: 100%; max-height: 85%; object-fit: contain; }
+  .ba-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .report-fig .carousel-caption { margin-top: 8px; text-align: center; }
+
+  @media (max-width: 900px) {
+    .report-figrow { flex-direction: column; gap: 24px; }
+    .report-figrow .report-fig { width: 100%; }
+  }
+
+
+  /* Image figures */
+  .fig-frame { overflow: hidden; }
+  .fig-frame img { width: 100%; height: auto; display: block; }
+  .fig-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fig-panels figure { margin: 0; min-width: 0; }
+  .fig-panels .ba-label { display: block; text-align: center; margin-top: 8px; }
+  .report-fig.pair { max-width: 760px; margin: 28px auto; }
+  .report-fig.narrow { max-width: 560px; margin: 28px auto; }
+  @media (max-width: 560px) { .fig-panels { grid-template-columns: 1fr; } }
+
+
+  
+
+  .carousel-caption strong { font-weight: 600; color: var(--ink); }
+
+  /* Bare video embeds: no frame, border or background */
+  .video-frame { width: 100%; aspect-ratio: 16/9; }
+  .video-frame.vertical { flex: 1 1 0; min-height: 0; aspect-ratio: auto; position: relative; }
+  .video-frame.vertical iframe { position: absolute; inset: 0; }
+  .video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .report-split .report-media.vertical { flex: 0 0 480px; align-self: stretch; display: flex; flex-direction: column; position: relative; }
+  /* Fig. 1 caption hangs below the video so the video's bottom lines up with the end of the text */
+  .report-split .report-media.vertical .carousel-caption { position: absolute; top: 100%; left: 0; right: 0; }
+  .report-split-text p:last-child { margin-bottom: 0; }
+  .after-split { margin-top: 64px; }
+  .report-figrow.pair { max-width: 760px; margin: 28px auto; }
+  @media (max-width: 900px) {
+    .report-split .report-media.vertical { flex: 1 1 auto; width: 100%; max-width: 360px; margin: 0 auto; align-self: center; }
+    .report-split .report-media.vertical .carousel-caption { position: static; }
+    .after-split { margin-top: 28px; }
+    .video-frame.vertical { flex: none; aspect-ratio: 9/16; }
+  }
+
+  /* No rule under section headers */
+  .report-subhead { border-bottom: none; padding-bottom: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html#top" class="nav-mark"><img src="images/Logo-NoBackground.webp" alt="Logo"></a>
+
+    <div class="nav-tabs">
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Floating exit button: stays on screen while scrolling; opens with its label, then collapses to the icon -->
+<a class="exit-fab is-open" href="index.html#robotic-band" aria-label="Back to projects">
+  <span class="exit-fab-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+  </span>
+  <span class="exit-fab-label" aria-hidden="true">Back to projects</span>
+</a>
+
+<!-- ============ ROBOTIC BAND FULL REPORT ============ -->
+<!-- id stays "dtc-report" so the existing #dtc-report padding/scroll rules in style.css apply -->
+<section id="dtc-report" class="wrap">
+
+  <div class="report-header">
+    <div class="report-header-text">
+      <div>
+        <h2 class="report-title long">Robotic Band</h2>
+        <p class="report-subtitle">Built Pulse, a six-armed robot drummer, with Northwestern&rsquo;s Robotics Club.</p>
+      </div>
+
+      <div class="sheet-meta" style="margin-top: 14px;">
+        <span>Year: <span class="hl-black">2024&ndash;Present</span></span>
+        <span>Status: <span class="hl-black">Ongoing</span></span>
+      </div>
+    </div>
+
+    <div class="report-header-photo">
+      <img src="images/RoboticBand/drum-robot.webp" alt="Pulse, the robot drummer, seated behind its drum kit">
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <h3 class="report-subhead">Overview</h3>
+    <div class="report-split">
+      <div class="report-split-text">
+        <p>At the Northwestern University Robotics Club (NURC), I became an early member of the Robotic Band subteam, the perfect environment to pursue both my love for music and robots.</p>
+        <p>In 2024, I began working on the band&rsquo;s robot drummer, <span class="hl-black">Pulse</span>, focusing on CAD and 3D-printing components for the arms and torso. Pulse has 6 arms, 1 per drum, with servo motors and linkages to swing its drumsticks. 3 stepper motors control the torso&rsquo;s pitch and yaw movement, allowing the robot to bob up and down to its own music. Its head was designed like an old beige box computer and can display faces and videos during performances. See <a class="figure-link" href="#fig-1">Fig.&nbsp;1</a> for a video of Pulse in action.</p>
+      </div>
+
+      <div class="report-media vertical" id="fig-1">
+        <div class="video-frame vertical">
+          <iframe src="https://www.youtube.com/embed/NKGymbpgohY" title="Pulse in action" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+        </div>
+        <p class="carousel-caption"><strong>Fig. 1:</strong> Pulse in action</p>
+      </div>
+    </div>
+
+    <p class="after-split">At the end of my freshman year, Pulse gave its first performance at Northwestern&rsquo;s 2025 Kresgepalooza music event. Alongside human musicians, it performed several Daft Punk songs, including &ldquo;Get Lucky&rdquo; (<a class="figure-link" href="#fig-2">Fig.&nbsp;2</a>). I designed the sheet metal torso shown in the video with Onshape&rsquo;s bend simulation (<a class="figure-link" href="#fig-3">Fig. 3</a>, <a class="figure-link" href="#fig-4">4</a>). It remains one of my favorite contributions.</p>
+
+    <div class="report-fig single" id="fig-2">
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/FyhijzrO1wY" title="Get Lucky performance at Kresgepalooza 2025" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      </div>
+      <p class="carousel-caption"><strong>Fig. 2:</strong> &ldquo;Get Lucky&rdquo; at Kresgepalooza 2025</p>
+    </div>
+
+    <div class="report-figrow pair">
+      <div class="report-fig" id="fig-3">
+        <div class="fig-frame"><img src="images/RoboticBand/TorsoCADBent.webp" alt="Sheet metal torso CAD in its bent, assembled form" width="864" height="1080"></div>
+        <p class="carousel-caption"><strong>Fig. 3:</strong> Torso CAD in Onshape, bent</p>
+      </div>
+      <div class="report-fig" id="fig-4">
+        <div class="fig-frame"><img src="images/RoboticBand/TorsoCADUnbent.webp" alt="Sheet metal torso flat patterns" width="864" height="1080"></div>
+        <p class="carousel-caption"><strong>Fig. 4:</strong> Torso CAD in Onshape, unbent</p>
+      </div>
+    </div>
+
+    <p>During my sophomore year, I continued working on Pulse to improve torso stability for performances. With the Drummer Mechanical Team, I helped ideate stabilizing mechanisms, including gear boxes for pitch and a turntable for yaw motion, and performed hand-calculations to analyze torso loads and select gear ratios. I then designed new actuation components and performed hand-calculated stress analysis for verification and material selection. See <a class="figure-link" href="#fig-5">Fig. 5</a> and <a class="figure-link" href="#fig-6">Fig. 6</a> for a before and after of the actuation design. I also redesigned weak, easily broken arm joints with additional fillets, ribs, and more uniform cross-sections, and had them printed at higher infills to improve strength (<a class="figure-link" href="#fig-7">Fig.&nbsp;7</a>).</p>
+
+    <div class="report-figrow pair">
+      <div class="report-fig" id="fig-5">
+        <div class="fig-frame"><img src="images/RoboticBand/TorsoBefore.webp" alt="Torso actuation before: PLA linkage and PLA gear actuation" width="1080" height="1300"></div>
+        <p class="carousel-caption"><strong>Fig. 5:</strong> Torso actuation design, before</p>
+      </div>
+      <div class="report-fig" id="fig-6">
+        <div class="fig-frame"><img src="images/RoboticBand/TorsoAfter.webp" alt="Torso actuation after: aluminum linkage, gearbox and belt drive actuation" width="1080" height="1300"></div>
+        <p class="carousel-caption"><strong>Fig. 6:</strong> Torso actuation design, after</p>
+      </div>
+    </div>
+
+    <div class="report-fig narrow" id="fig-7">
+      <div class="fig-frame"><img src="images/RoboticBand/JointBeforeAndAfter.webp" alt="Arm joint before (plain cylinder) and after (ribbed and filleted)" width="1440" height="1080"></div>
+      <p class="carousel-caption"><strong>Fig. 7:</strong> Arm joint, before and after</p>
+    </div>
+
+    <p>With these improvements, Pulse put on quite a show as it jammed and grooved at Northwestern&rsquo;s 2026 Kresgepalooza. This time, alongside members of Robotic Band (including me as the band&rsquo;s bassist), it performed several pop culture hits like &ldquo;Mr. Brightside&rdquo; by The Killers (<a class="figure-link" href="#fig-8">Fig.&nbsp;8</a>).</p>
+
+    <div class="report-fig single" id="fig-8">
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/8rwLJ9hlxh8?start=2" title="Mr. Brightside performance at Kresgepalooza 2026" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      </div>
+      <p class="carousel-caption"><strong>Fig. 8:</strong> &ldquo;Mr. Brightside&rdquo; at Kresgepalooza 2026</p>
+    </div>
+
+  </div>
+</section>
+
+<script>
+// Exit button: show the full "Back to all projects" label first, then shrink to the arrow
+// and slide it under the nav logo.
+(function() {
+  var fab = document.querySelector('.exit-fab');
+  if (!fab) return;
+  var logo = document.querySelector('.nav-mark img');
+
+  // Center the collapsed arrow on the logo's center line.
+  function alignToLogo() {
+    if (!logo) return;
+    var r = logo.getBoundingClientRect();
+    if (r.width > 0) fab.style.setProperty('--logo-cx', (r.left + r.width / 2) + 'px');
+  }
+  alignToLogo();
+  if (logo && !logo.complete) logo.addEventListener('load', alignToLogo);
+  window.addEventListener('resize', alignToLogo);
+
+  var closed = false;
+  function collapse() {
+    if (closed) return; closed = true;
+    alignToLogo();
+    fab.classList.remove('is-open');
+  }
+  setTimeout(collapse, 0); // safety net
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(function() { setTimeout(collapse, 0); });   // starts counting once the page has faded in
+})();
+</script>
+<script>
+// Fig. links: same smooth, centred scroll as the other project pages
+(function() {
+  Array.prototype.forEach.call(document.querySelectorAll('a.figure-link[href^="#fig-"]'), function(a) {
+    a.addEventListener('click', function(e) {
+      var target = document.getElementById(a.getAttribute('href').slice(1));
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+})();
+</script>
+<script src="lightbox.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  // Scroll memory: on reload (or back/forward) return to the exact scroll position the visitor was at,
+  // instead of re-jumping to the #hash target. Fresh navigations (e.g. index.html#brake-caliper
+  // from a project page) still jump to their target.
+  (function() {
+    var root = document.documentElement;
+    var KEY = 'scrollY:' + location.pathname;
+    var navType = '';
+    try {
+      var entry = performance.getEntriesByType('navigation')[0];
+      navType = entry ? entry.type : '';
+    } catch (e) {}
+    var saved = null;
+    if (navType === 'reload' || navType === 'back_forward') {
+      try { var v = sessionStorage.getItem(KEY); if (v !== null) saved = parseFloat(v); } catch (e) {}
+      if (saved !== null && isNaN(saved)) saved = null;
+    }
+    var restoring = saved !== null && saved > 0;
+
+    // We handle scroll restoration ourselves so the browser doesn't fight us.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+    // Hero intro: only on a fresh load (no #hash, not restoring a scroll position) and if
+    // the visitor hasn't asked for reduced motion.
+    if (!location.hash && !restoring && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      root.classList.add('intro-pending');
+    }
+
+    // Start remembering the scroll position only once the initial jump/restore is done,
+    // so the temporary top-of-page position never overwrites the saved one.
+    var tracking = false, ticking = false;
+    function save() { try { sessionStorage.setItem(KEY, String(window.scrollY || window.pageYOffset || 0)); } catch (e) {} }
+    function startTracking() {
+      tracking = true;
+      window.addEventListener('scroll', function() {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(function() { ticking = false; save(); });
+      }, { passive: true });
+      window.addEventListener('pagehide', save);
+      document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') save(); });
+    }
+
+    var h = location.hash;
+    var hasTarget = h && h.length > 1;
+    if (!hasTarget && !restoring) {
+      window.addEventListener('load', startTracking);
+      return;
+    }
+
+    // Keep the page invisible until fonts/images have loaded, jump straight to the spot,
+    // then fade the page in.
+    root.classList.add('hash-pending');   // hides <body> only, so the page background stays visible
+    var done = false;
+    function reveal() {
+      if (done) return; done = true;
+      if (restoring) {
+        window.scrollTo({ top: saved, left: 0, behavior: 'instant' });
+      } else {
+        var el = null;
+        try { el = document.getElementById(decodeURIComponent(h.slice(1))); } catch (e) {}
+        if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+      }
+      requestAnimationFrame(function() {
+        root.classList.remove('hash-pending');   // fades in via the body transition in style.css
+        if (!tracking) startTracking();
+      });
+    }
+    window.addEventListener('load', function() {
+      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(reveal); } else { reveal(); }
+    });
+    setTimeout(reveal, 2500); // safety net so the page can never stay invisible
+  })();
+</script>
+<title>Alexander Wan — Mechanical Engineering Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Softer, warm-gray borders on the project cards (instead of near-black) */
+  :root { --card-border: #d3cfc6; }
+  .sheet { border-color: var(--card-border); }
+  .sheet-media { border-bottom-color: var(--card-border); }
+
+  /* While the page is held back (arriving from a project page, or restoring scroll position),
+     show a small spinner instead of an empty grid. It only appears if the wait lasts > 0.3s. */
+  html.hash-pending::after {
+    content: ""; position: fixed; left: 50%; top: 50%; z-index: 1000;
+    width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%;
+    border: 2px solid rgba(31, 36, 33, 0.15); border-top-color: var(--orange);
+    opacity: 0; pointer-events: none;
+    animation: loaderIn 0.3s ease 0.3s forwards, loaderSpin 0.8s linear infinite;
+  }
+  @keyframes loaderIn { to { opacity: 1; } }
+  @keyframes loaderSpin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body id="top">
+
+<header class="hero-anim" style="--y:0px;">
+  <nav class="wrap">
+    <a href="#top" class="nav-mark">
+      <img src="images/Logo-NoBackground.webp" alt="Logo">
+    </a>
+
+    <div class="nav-tabs">
+      <!-- <a href="#top">Home</a> -->
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-text">
+      <div class="name-wrap hero-anim" style="--d:0.15s;">
+        <h1 class="name"><span id="alex-word">Alexander</span><br>Wan</h1>
+      </div>
+      <p class="hero-bio hero-anim" style="--d:0.4s;">
+        An undergraduate junior studying <span class="hl-black">Mechanical Engineering</span> at <span class="hl-purple">Northwestern University</span>, with a concentration in <span class="hl-black">Robotics</span>. Also pursuing a <span class="hl-black">Kellogg Certificate in Managerial Analytics</span>.
+      </p>
+      <div class="hero-links hero-anim" style="--d:0.65s;">
+        <a class="primary" href="#projects">View Projects ↓</a>
+        <a href="mailto:chenchenwan2028@u.northwestern.edu">Email</a>
+        <a href="https://www.linkedin.com/in/alexander-s-wan/">LinkedIn</a>
+        <a href="https://github.com/wan-sichEN">GitHub</a>
+      </div>
+    </div>
+
+    <div class="hero-photo">
+      <img src = "images/ColorfulPortraitNoBackground.png" alt = "Colorful Portrait">
+    </div>
+  </div>
+
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="wrap" style="margin-top: 24px;">
+  <div class="sheet-heading">
+    <div class="sheet-heading-top">
+      <h2>About</h2>
+    </div>
+    <div class="header-divider">
+      <svg viewBox="0 0 1000 13" preserveAspectRatio="none" shape-rendering="geometricPrecision">
+        <path d="M45,7 C25,4.5 0,5 3,7.2 C6,9 27,8.6 37,7.6 C41,7.2 43,7.1 45,7 Z" fill="var(--ink)"/>
+        <path d="M45,6.85 C85,6.5 115,5.6 155,5.5 C300,5.35 550,6.1 758,6.65 C858,6.9 935,7.0 1000,6.75 L1000,7.25 C935,7.5 858,7.35 758,7.1 C550,7.65 300,8.4 165,8.25 C120,8.2 90,7.5 45,7.15 Z" fill="var(--ink)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="about-row">
+    <div class="about-text">
+      <p class="about-greeting">Hi there, I&rsquo;m <span style="color: var(--orange-fire);">Chenchen</span>!</p>
+      <p>Born and raised in Lake County, IL, with a healthy dose of science fiction and drawing, I came to love imagining things and bringing them to life. And at the center of it all was <span class="hl-black">robotics.</span></p>
+      <p>Transformers, mech-suits, you name it, I fell in love with the idea of building machines that move and react. This interest has since led me to build <span class="hl-black">robotic hands</span> at HAND ERC, design <span class="hl-black">music-playing robots</span> for Northwestern&rsquo;s Robotics Club, and pursue mechanical engineering more broadly. 
+        As a Disposables Engineering Intern at Fresenius Kabi USA, I&rsquo;ve come to value how my interests can be directed towards things that meaningfully impact people&rsquo;s lives, particularly in fields like <span class="hl-black">medtech.</span></p>
+      <p>Outside of engineering, my love to imagine and create still shines through my hobbies, such as <span class="hl-black">drawing, creative writing, and music</span>. I&rsquo;m actually the bassist in NURC&rsquo;s robotic band&hellip; until the bass robot is complete, that is. I hope to keep combining creativity and engineering to drive meaningful innovation and help others.</p>
+    </div>
+    <div class="about-photo">
+      <!-- <span class="placeholder-txt">REPLACE: professional headshot</span> -->
+      <img src = "images/Portfolio_Headshot.webp" alt = "Professional Photo">
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROJECTS ============ -->
+<section id="projects" class="wrap" style="margin-top: 48px;">
+  <div class="sheet-heading">
+    <div class="sheet-heading-top">
+      <h2>Projects</h2>
+    </div>
+    <div class="header-divider">
+      <svg viewBox="0 0 1000 13" preserveAspectRatio="none" shape-rendering="geometricPrecision">
+        <path d="M45,7 C25,4.5 0,5 3,7.2 C6,9 27,8.6 37,7.6 C41,7.2 43,7.1 45,7 Z" fill="var(--ink)"/>
+        <path d="M45,6.85 C85,6.5 115,5.6 155,5.5 C300,5.35 550,6.1 758,6.65 C858,6.9 935,7.0 1000,6.75 L1000,7.25 C935,7.5 858,7.35 758,7.1 C550,7.65 300,8.4 165,8.25 C120,8.2 90,7.5 45,7.15 Z" fill="var(--ink)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="projects-grid">
+
+  <!-- ---- PROJECT 1: full case study (e.g. Brake Caliper) ---- -->
+  <div class="clip-frame" id="brake-caliper">
+    <!-- Gem-style paperclip: the "back" copy sits under the card, the "front" copy over it,
+         so the clip looks hooked over the top edge of the sheet -->
+    <div class="paperclip-wrap paperclip-back" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipBack1)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipBack1" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#a9afb4"/>
+            <stop offset="50%" stop-color="#7d8388"/>
+            <stop offset="100%" stop-color="#5f656a"/>
+          </linearGradient>
+        </defs>
+        <path d="M7 22V50A5 5 0 0 0 17 50V10A7 7 0 0 0 3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+    <div class="paperclip-wrap paperclip-front" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipShine1)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipShine1" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#f2f4f5"/>
+            <stop offset="32%" stop-color="#aeb4b9"/>
+            <stop offset="55%" stop-color="#e8eaeb"/>
+            <stop offset="78%" stop-color="#8a9095"/>
+            <stop offset="100%" stop-color="#6b7176"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+  <article class="sheet">
+    <a class="sheet-media" href="brake-caliper-project.html">
+      <div class="media-inner">
+        <img src="images/BrakeCalipers/Brakes_On_Bike.webp" alt="Brake Caliper Thumbnail" style="object-position:50% 50%;">
+      </div>
+    </a>
+    <div class="sheet-body">
+      <div class="sheet-top-row">
+        <h3>Brake Caliper</h3>
+      </div>
+      <div class="sheet-meta">
+        <span>Design/Manufacturing:</span>
+        <span>Siemens NX, FEA, Topology Optimization</span>
+        <!-- <span>Fall 2025</span> -->
+      </div>
+      <p class="desc">
+        <!-- REPLACE: 2-4 sentences — the problem you were solving, your design
+             approach, and the headline result (e.g. clamp force achieved,
+             weight reduction, factor of safety). -->
+        Designed and optimized a lightweight bicycle brake caliper to meet ISO braking standards.
+      <!-- </p>
+      <div class="spec-grid">
+        <div class="spec-cell"><span class="label">Material</span><span class="val">6061-T6 Al</span></div>
+        <div class="spec-cell"><span class="label">Clamp Force</span><span class="val">TBD N</span></div>
+        <div class="spec-cell"><span class="label">FOS</span><span class="val">TBD</span></div>
+        <div class="spec-cell"><span class="label">Mass</span><span class="val">TBD g</span></div>
+      </div>
+      <a class="sheet-link" href="brake-caliper-project.html">Read full report →</a> -->
+    </div>
+  </article>
+  </div>
+
+  <!-- ---- PROJECT 2: quick-look, no writeup yet (Haptic Paddle) ---- -->
+  <div class="clip-frame" id="haptic-paddle">
+    <!-- Gem-style paperclip: the "back" copy sits under the card, the "front" copy over it,
+         so the clip looks hooked over the top edge of the sheet -->
+    <div class="paperclip-wrap paperclip-back" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipBack2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipBack2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#a9afb4"/>
+            <stop offset="50%" stop-color="#7d8388"/>
+            <stop offset="100%" stop-color="#5f656a"/>
+          </linearGradient>
+        </defs>
+        <path d="M7 22V50A5 5 0 0 0 17 50V10A7 7 0 0 0 3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+    <div class="paperclip-wrap paperclip-front" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipShine2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipShine2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#f2f4f5"/>
+            <stop offset="32%" stop-color="#aeb4b9"/>
+            <stop offset="55%" stop-color="#e8eaeb"/>
+            <stop offset="78%" stop-color="#8a9095"/>
+            <stop offset="100%" stop-color="#6b7176"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+  <article class="sheet">
+    <a class="sheet-media" href="haptic-paddle-project.html">
+      <div class="media-inner">
+        <img src="images/HapticPaddle/Haptic_Paddle_Thumbnail.webp" alt="Haptic Paddle Thumbnail" style="object-position:50% 45%;">
+      </div>
+    </a>
+    <div class="sheet-body">
+      <div class="sheet-top-row">
+        <h3>Haptic Paddle</h3>
+      </div>
+      <div class="sheet-meta">
+        <span>Robotics:</span>
+        <span>C, Motor Control, Microcontrollers, Onshape</span>
+        <!-- <span>Term</span> -->
+      </div>
+      <p class="desc">
+        <!-- REPLACE: 2-3 sentences is enough for a "quick-look" project —
+             what it is, your role, what it does. No full report needed. -->
+        Created a 1 DOF haptic joystick that renders virtual forces
+        to the user's hand.
+      <!-- </p>
+      <a class="sheet-link" href="#">View gallery →</a> -->
+    </div>
+  </article>
+  </div>
+
+  <!-- ---- PROJECT 3: full case study (HAND ERC) ---- -->
+  <div class="clip-frame" id="hand-erc">
+    <!-- Gem-style paperclip: the "back" copy sits under the card, the "front" copy over it,
+         so the clip looks hooked over the top edge of the sheet -->
+    <div class="paperclip-wrap paperclip-back" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipBack3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipBack3" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#a9afb4"/>
+            <stop offset="50%" stop-color="#7d8388"/>
+            <stop offset="100%" stop-color="#5f656a"/>
+          </linearGradient>
+        </defs>
+        <path d="M7 22V50A5 5 0 0 0 17 50V10A7 7 0 0 0 3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+    <div class="paperclip-wrap paperclip-front" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipShine3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipShine3" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#f2f4f5"/>
+            <stop offset="32%" stop-color="#aeb4b9"/>
+            <stop offset="55%" stop-color="#e8eaeb"/>
+            <stop offset="78%" stop-color="#8a9095"/>
+            <stop offset="100%" stop-color="#6b7176"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+  <article class="sheet">
+    <a class="sheet-media" href="hand-erc-project.html">
+      <div class="media-inner">
+        <img src="images/HANDERC/RedesignedNanoHand.webp" alt="HAND ERC Thumbnail" style="object-position:50% 40%;">
+      </div>
+    </a>
+    <div class="sheet-body">
+      <div class="sheet-top-row">
+        <h3>HAND ERC</h3>
+      </div>
+      <div class="sheet-meta">
+        <span>Robotics:</span>
+        <span>Fusion 360, Blender, 3D Printing, Silicone Casting</span>
+        <!-- <span>Term</span> -->
+      </div>
+      <p class="desc">
+        <!-- REPLACE: 2-3 sentences is enough for a "quick-look" project —
+             what it is, your role, what it does. No full report needed. -->
+        Redesigned and built an open-source robotic hand as a test platform for novel
+        tactile sensors.
+      <!-- </p>
+      <a class="sheet-link" href="#">View gallery →</a> -->
+    </div>
+  </article>
+  </div>
+
+  <!-- ---- PROJECT 4: full case study (Robotic Band) ---- -->
+  <div class="clip-frame" id="robotic-band">
+    <!-- Gem-style paperclip: the "back" copy sits under the card, the "front" copy over it,
+         so the clip looks hooked over the top edge of the sheet -->
+    <div class="paperclip-wrap paperclip-back" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipBack4)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipBack4" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#a9afb4"/>
+            <stop offset="50%" stop-color="#7d8388"/>
+            <stop offset="100%" stop-color="#5f656a"/>
+          </linearGradient>
+        </defs>
+        <path d="M7 22V50A5 5 0 0 0 17 50V10A7 7 0 0 0 3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+    <div class="paperclip-wrap paperclip-front" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipShine4)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipShine4" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#f2f4f5"/>
+            <stop offset="32%" stop-color="#aeb4b9"/>
+            <stop offset="55%" stop-color="#e8eaeb"/>
+            <stop offset="78%" stop-color="#8a9095"/>
+            <stop offset="100%" stop-color="#6b7176"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+  <article class="sheet">
+    <a class="sheet-media" href="robotic-band-project.html">
+      <div class="media-inner">
+        <img src="images/RoboticBand/drum-robot.webp" alt="Robotic Band Thumbnail" style="object-position:50% 35%;">
+      </div>
+    </a>
+    <div class="sheet-body">
+      <div class="sheet-top-row">
+        <h3>Robotic Band</h3>
+      </div>
+      <div class="sheet-meta">
+        <span>Robotics:</span>
+        <span>Onshape, Sheet Metal, 3D Printing, Hand Calculations</span>
+        <!-- <span>Term</span> -->
+      </div>
+      <p class="desc">
+        <!-- REPLACE: 2-3 sentences is enough for a "quick-look" project —
+             what it is, your role, what it does. No full report needed. -->
+        Designed and integrated mechanical components for robotic drummer.
+      <!-- </p>
+      <a class="sheet-link" href="#">View gallery →</a> -->
+    </div>
+  </article>
+  </div>
+
+  <!-- ---- PROJECT 5: full case study (Pulley Paradox) ---- -->
+  <div class="clip-frame" id="pulley-paradox">
+    <!-- Gem-style paperclip: the "back" copy sits under the card, the "front" copy over it,
+         so the clip looks hooked over the top edge of the sheet -->
+    <div class="paperclip-wrap paperclip-back" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipBack5)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipBack5" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#a9afb4"/>
+            <stop offset="50%" stop-color="#7d8388"/>
+            <stop offset="100%" stop-color="#5f656a"/>
+          </linearGradient>
+        </defs>
+        <path d="M7 22V50A5 5 0 0 0 17 50V10A7 7 0 0 0 3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+    <div class="paperclip-wrap paperclip-front" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipShine5)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipShine5" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#f2f4f5"/>
+            <stop offset="32%" stop-color="#aeb4b9"/>
+            <stop offset="55%" stop-color="#e8eaeb"/>
+            <stop offset="78%" stop-color="#8a9095"/>
+            <stop offset="100%" stop-color="#6b7176"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+  <article class="sheet">
+    <a class="sheet-media" href="pulley-paradox-project.html">
+      <div class="media-inner">
+        <img src="images/DTC2/PulleyParadox.webp" alt="Pulley Paradox Thumbnail" style="object-position:50% 55%;">
+      </div>
+    </a>
+    <div class="sheet-body">
+      <div class="sheet-top-row">
+        <h3>Pulley Paradox</h3>
+      </div>
+      <div class="sheet-meta">
+        <span>Product Design:</span>
+        <span>MATLAB, Onshape, Machining, Prototyping</span>
+        <!-- <span>Term</span> -->
+      </div>
+      <p class="desc">
+        <!-- REPLACE: 2-3 sentences is enough for a "quick-look" project —
+             what it is, your role, what it does. No full report needed. -->
+        Designed a portable, electronic-free lifting device to help a stroke survivor recover from falls.
+      <!-- </p>
+      <a class="sheet-link" href="#">View gallery →</a> -->
+    </div>
+  </article>
+  </div>
+
+  <!-- ---- PROJECT 6: full case study (DTC project) ---- -->
+  <div class="clip-frame" id="the-tele">
+    <!-- Gem-style paperclip: the "back" copy sits under the card, the "front" copy over it,
+         so the clip looks hooked over the top edge of the sheet -->
+    <div class="paperclip-wrap paperclip-back" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipBack6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipBack6" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#a9afb4"/>
+            <stop offset="50%" stop-color="#7d8388"/>
+            <stop offset="100%" stop-color="#5f656a"/>
+          </linearGradient>
+        </defs>
+        <path d="M7 22V50A5 5 0 0 0 17 50V10A7 7 0 0 0 3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+    <div class="paperclip-wrap paperclip-front" aria-hidden="true">
+      <svg viewBox="0 -1 24 66" fill="none" stroke="url(#clipShine6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="clipShine6" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="64">
+            <stop offset="0%" stop-color="#f2f4f5"/>
+            <stop offset="32%" stop-color="#aeb4b9"/>
+            <stop offset="55%" stop-color="#e8eaeb"/>
+            <stop offset="78%" stop-color="#8a9095"/>
+            <stop offset="100%" stop-color="#6b7176"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 10V54A9 9 0 0 0 21 54V18"/>
+      </svg>
+    </div>
+  <article class="sheet">
+    <a class="sheet-media" href="dtc-project.html">
+      <div class="media-inner">
+        <img src = "images/DTC1/The_Tele.webp" alt = "The Tele Thumbnail">
+      </div>
+    </a>
+    <div class="sheet-body">
+      <div class="sheet-top-row">
+        <h3>The Tele</h3>
+      </div>
+      <div class="sheet-meta">
+        <span>Product Design:</span>
+        <span>Prototyping, User-centered testing, Onshape</span>
+        <!-- <span>Northwestern University</span> -->
+      </div>
+      <p class="desc">
+        Designed a one-handed diaper-changing station for patients with hemiplegia.
+      <!-- </p>
+      <div class="spec-grid">
+        <div class="spec-cell"><span class="label">Role</span><span class="val">Mechanism Lead</span></div>
+        <div class="spec-cell"><span class="label">Team Size</span><span class="val">4</span></div>
+        <div class="spec-cell"><span class="label">Client</span><span class="val">Ascension Alexian</span></div>
+      </div>
+      <a class="sheet-link" href="dtc-project.html">Read full report →</a> -->
+    </div>
+  </article>
+  </div>
+
+  </div>
+</section>
+
+<!-- ============ CONTACT / FOOTER ============ -->
+<footer id="contact">
+  <div class="wrap contact-wrap">
+    <h2>Contact Me!</h2>
+    <div class="hero-links" style="margin-top:26px;">
+      <a class="primary" href="mailto:chenchenwan2028@u.northwestern.edu">Email</a>
+      <a href="https://www.linkedin.com/in/alexander-s-wan/">LinkedIn</a>
+      <a href="https://github.com/wan-sichEN">GitHub</a>
+    </div>
+    <div class="end-of-drawing" style="margin-top:48px;">— END OF DRAWING —</div>
+  </div>
+</footer>
+
+<script>
+  function syncContentWidth() {
+    var textEl = document.querySelector('.hero .hero-text');
+    var photoEl = document.querySelector('.hero .hero-photo img') || document.querySelector('.hero .hero-photo');
+    if (!textEl || !photoEl) return;
+    var tRect = textEl.getBoundingClientRect();
+    var pRect = photoEl.getBoundingClientRect();
+    var left = Math.min(tRect.left, pRect.left);
+    var right = Math.max(tRect.right, pRect.right);
+    var span = right - left;
+    if (span > 0) {
+      var withPadding = Math.round(span) + 96; // match hero .wrap's 48px side padding
+      document.documentElement.style.setProperty('--content-width', withPadding + 'px');
+    }
+  }
+  window.addEventListener('load', syncContentWidth);
+  // Enable smooth scrolling only after load, so links like index.html#projects land instantly
+  window.addEventListener('load', function() {
+    requestAnimationFrame(function() { document.documentElement.classList.add('smooth-scroll'); });
+  });
+  window.addEventListener('resize', syncContentWidth);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(syncContentWidth);
+  }
+</script>
+<script>
+// Hero intro: text fades in while the portrait is "drawn" in with a marker-style scribble mask.
+// (Pure SVG + Web Animations API, no library needed, and it works on the existing PNG.)
+(function() {
+  var root = document.documentElement;
+  if (!root.classList.contains('intro-pending')) return;
+
+  var photo = document.querySelector('.hero-photo');
+  var img = photo && photo.querySelector('img');
+  var finished = false;
+
+  function textIn() { root.classList.add('intro-go'); }   // fades in the nav, name, bio and buttons
+
+  function finish(svg) {
+    if (finished) return; finished = true;
+    textIn();                                  // no-op if already started
+    root.classList.remove('intro-pending');   // reveals the real portrait
+    if (svg) requestAnimationFrame(function() { svg.remove(); });
+  }
+
+  // 1) the drawing starts first; the text follows shortly after (see draw()).
+  //    Fallback: if the portrait is slow to load, don't keep the text waiting.
+  setTimeout(textIn, 1500);
+
+  // 2) draw the portrait
+  if (!img || !('animate' in Element.prototype)) { finish(); return; }
+  setTimeout(function() { finish(); }, 6000);   // safety net
+
+  function draw() {
+    var W = img.naturalWidth, H = img.naturalHeight;
+    if (!W || !H) { finish(); return; }
+
+    var pr = photo.getBoundingClientRect(), ir = img.getBoundingClientRect();
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('class', 'portrait-draw');
+    svg.style.cssText = 'position:absolute;pointer-events:none;' +
+      'left:' + (ir.left - pr.left) + 'px;top:' + (ir.top - pr.top) + 'px;' +
+      'width:' + ir.width + 'px;height:' + ir.height + 'px;' +
+      'filter:drop-shadow(0 18px 24px rgba(31,36,33,0.18));';
+
+    // zig-zag marker path that sweeps back and forth over the whole portrait
+    var rows = 10, step = H / rows, sw = step * 1.9, m = sw / 2, dy = step * 0.8;
+    var d = 'M' + (-m) + ',' + (-sw * 0.25), y = -sw * 0.25, toRight = true;
+    while (y < H + sw * 0.25) {
+      y += dy;
+      d += ' L' + (toRight ? W + m : -m) + ',' + y;
+      toRight = !toRight;
+    }
+
+    svg.innerHTML =
+      '<defs><mask id="portraitMask" maskUnits="userSpaceOnUse" x="0" y="0" width="' + W + '" height="' + H + '">' +
+        '<path d="' + d + '" fill="none" stroke="#fff" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</mask></defs>' +
+      '<image href="' + img.currentSrc + '" width="' + W + '" height="' + H + '" mask="url(#portraitMask)"/>';
+    photo.appendChild(svg);
+
+    var path = svg.querySelector('path');
+    var len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+
+    var anim = path.animate(
+      [{ strokeDashoffset: len }, { strokeDashoffset: 0 }],
+      { duration: 1500, easing: 'cubic-bezier(0.45, 0.05, 0.35, 1)', fill: 'forwards' }
+    );
+    anim.onfinish = function() { finish(svg); };
+    setTimeout(textIn, 450);   // text starts fading in once the drawing is underway
+  }
+
+  if (img.complete && img.naturalWidth) draw();
+  else { img.addEventListener('load', draw); img.addEventListener('error', function() { finish(); }); }
+})();
+</script>
+</body>
+</html>
